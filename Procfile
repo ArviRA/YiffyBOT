@@ -1,1 +1,1 @@
-web: python telegram.py $PORT
+web:gunicon app:app
