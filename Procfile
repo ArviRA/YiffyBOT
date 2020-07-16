@@ -1,1 +1,1 @@
-web: python3 telegram.py $PORT
+web: python telegram.py $PORT
