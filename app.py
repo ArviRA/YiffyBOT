@@ -49,7 +49,7 @@ def send_welcome(message):
 
 @bot.message_handler(func=lambda message: True)
 def echo_all(message):
-    global search,select,search_result,quality,torrents,current_message
+    global search,select,search_result,quality,torrents
     if(search):
         base_url = ""
         #if back == False:
