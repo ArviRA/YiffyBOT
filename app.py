@@ -52,6 +52,8 @@ def send_welcome(message):
 def echo_all(message):
     global search,select,search_result,quality,torrents
     if(search):
+        start = False
+        search = False
         base_url = ""
         #if back == False:
         current_message = message
@@ -68,8 +70,7 @@ def echo_all(message):
             search_result.append((dummy,j.text,i["href"]))
         
         #print(search,search_result)
-        start = False
-        search = False
+        
         select = True
         markup = types.ReplyKeyboardMarkup(row_width=4)
         #print(search_result)
