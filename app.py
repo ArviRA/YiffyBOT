@@ -17,7 +17,7 @@ current_message = None
 back = False
 search_result = []
 torrents = []
-TOKEN = "1145940392:AAGAy_dEqfI0IXDTFiNPNZ_dagwYSAkJmYE"
+TOKEN = "1010311458:AAFiDsa4J4pYXAi8UOblX2Vo3D7V8RhuvHg"
 bot = telebot.TeleBot(TOKEN)
 
 #bot.set_webhook(url="http://example.com")
