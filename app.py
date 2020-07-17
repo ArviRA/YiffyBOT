@@ -97,6 +97,7 @@ def echo_all(message):
             years=page.find("div",{"id":"movie-info"})
             years=str(years)[0:150]
             id = re.search('("\d+")',years).group().strip('"')   
+            print("\n\n\n\n id:::::",id)
             movie=requests.get("https://yts.mx/api/v2/movie_details.json?movie_id={}".format(id))
             movie = json.loads(movie.content)
             image_url=movie["data"]["movie"]['large_cover_image']
