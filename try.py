@@ -6,11 +6,13 @@ import re
 import json
 import os
 from telebot import types
+from telebot import apihelper
 from flask import Flask, request
 
 TOKEN = '1010311458:AAFiDsa4J4pYXAi8UOblX2Vo3D7V8RhuvHg'
 bot = telebot.TeleBot(token=TOKEN)
 server = Flask(__name__)
+apihelper.proxy = {'https': 'socks5://login:pass@12.11.22.33:8000'}
 
 search = False
 select = False
@@ -28,8 +30,7 @@ def send_info(message):
    "<b>Welcome to the Yify BOt 🤖!</b>\n"
    "Say /help to the bot to get to know about it!"
    )
-   summa=requests.get("https://yts.mx/api/v2/movie_details.json?movie_id=2652")
-   print("\n\n\n:mx api",summa)
+   print("\n\n\n:message",message)
    bot.send_message(message.chat.id, text, parse_mode='HTML')
 @bot.message_handler(commands=['help'])
 def send_info(message):
@@ -42,6 +43,16 @@ def send_info(message):
    "select the Quality of movie\n download the torrent! have fun."
    )
    bot.send_message(message.chat.id, text, parse_mode='HTML')
+
+@bot.message_handler(commands=['search'])
+def send_info(message):
+   global search
+   text = (
+   "Enter the movie name to search"
+   )
+   search = True
+   bot.send_message(message.chat.id, text, parse_mode='HTML')
+
 @bot.message_handler(commands=['search'])
 def send_info(message):
    global search
@@ -103,7 +114,7 @@ def reply_to_message(message):
                 break
         
         if flag == True:
-            all_links = requests.get("https://yts.ae"+base_url)
+            all_links = requests.get(" "+base_url)
             page = BeautifulSoup(all_links.content, 'html.parser')
             years=page.find("div",{"id":"movie-info"})
             years=str(years)[0:150]
