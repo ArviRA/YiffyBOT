@@ -2,8 +2,48 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import json
+from itertools import cycle
+import traceback
+from proxy_requests import ProxyRequests
+from lxml.html import fromstring
+
 search_result = []
+proxies = {
+ "http": "http://37.57.82.211:8282",
+ "https": "http://37.57.82.211:8282",
+}
+url = "http://httpbin.org/ip"
+r = requests.get("https://yts.pm/browse-movies/{}/all/all/0/latest/0/all".format("avengers"), proxies=proxies, verify=False)
+print("\n\n\nthis   nioi")
+print(r.json())
+
+#all_links = requests.get("https://yts.pm/browse-movies/{}/all/all/0/latest/0/all".format("avengers"),  proxies=proxies)
+#print(all_links,"\n\n\n")
+
+
+'''page = BeautifulSoup(r, 'html.parser')
+mydivs = page.findAll("a", {"class":"browse-movie-title"},href=True, text=True)
+years=page.findAll("div",{"class":"browse-movie-year"})
+print("\n\n\n\nMy div",mydivs,"\n\n\n\n")
+search_result = []
+for i,j in zip(mydivs,years):
+    dummy=i.text
+    if "[" in dummy :
+       dummy = dummy.split("] ")[1] 
+    
+    search_result.append((dummy,j.text,i["href"]))
+
+print(search_result)
+search_result = []'''
+
+
+
+
+
+
+
 all_links = requests.get("https://yifytorrent.vip/search?keyword=avengers")
+#print(all_links.content)
 page = BeautifulSoup(all_links.content, 'html.parser')
 divs=page.find("div",{"class":"homepage-dt"})
 for link in divs.find_all("a"):
