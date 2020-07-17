@@ -74,20 +74,29 @@ def reply_to_message(message):
         #if back == False:
         current_message = message
         print("\n\n\n message ",message.text,"\n\n\n")
-        all_links = requests.get("https://yts.mx/browse-movies/{}/all/all/0/latest/0/all".format(message.text))
-        print(all_links)
-        page = BeautifulSoup(all_links.content, 'html.parser')
-        mydivs = page.findAll("a", {"class":"browse-movie-title"},href=True, text=True)
-        years=page.findAll("div",{"class":"browse-movie-year"})
-        print("\n\n\n\nMy div",mydivs,"\n\n\n\n")
-        search_result = []
-        for i,j in zip(mydivs,years):
-            dummy=i.text
-            if "[" in dummy :
-                dummy = dummy.split("] ")[1] 
+        #all_links = requests.get("https://yts.mx/browse-movies/{}/all/all/0/latest/0/all".format(message.text))
+        #print(all_links)
+        #page = BeautifulSoup(all_links.content, 'html.parser')
+        #mydivs = page.findAll("a", {"class":"browse-movie-title"},href=True, text=True)
+        #years=page.findAll("div",{"class":"browse-movie-year"})
+        #print("\n\n\n\nMy div",mydivs,"\n\n\n\n")
+        #search_result = []
+        #for i,j in zip(mydivs,years):
+        #    dummy=i.text
+        #    if "[" in dummy :
+        #        dummy = dummy.split("] ")[1] 
     
-            search_result.append((dummy,j.text,i["href"]))
-        
+        #    search_result.append((dummy,j.text,i["href"]))
+        search_result = []
+        all_links = requests.get("https://yifytorrent.vip/search?keyword={}".format(message.text))
+        page = BeautifulSoup(all_links.content, 'html.parser')
+        divs=page.find("div",{"class":"homepage-dt"})
+        for link in divs.find_all("a"):
+          if link.text != '\n\n \n':
+            test = link['href'].split("-")  
+            test[0] = ''.join([i for i in test[0] if not i.isdigit()]).replace("movie","movies")
+            test = "-".join(test).replace("-","",1) 
+            search_result.append((link.text,test))
         print("\n\n\n\n search result",search_result)
         markup = types.ReplyKeyboardMarkup(row_width=4)
         #print(search_result)
@@ -95,7 +104,7 @@ def reply_to_message(message):
             search = False
             select = True
             for i in search_result:
-                keyword = str (i[0] + " " + i[1])
+                keyword = str(i[0])
                 item = types.KeyboardButton(keyword)
                 markup.add(item)
             bot.send_message(current_message.from_user.id, "Choose a movie:", reply_markup=markup)
@@ -105,14 +114,14 @@ def reply_to_message(message):
       elif select:
         flag=False
         for i in search_result:
-            if i[0] in message.text:
-                base_url=i[2]
+            if i[0] == message.text:
+                base_url=i[1]
                 #print(base_url)
                 flag=True
                 break
         
         if flag == True:
-            all_links = requests.get("https://yts.mx"+base_url)
+            all_links = requests.get("https://yifytorrent.vip/"+base_url)
             page = BeautifulSoup(all_links.content, 'html.parser')
             years=page.find("div",{"id":"movie-info"})
             years=str(years)[0:150]
