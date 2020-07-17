@@ -44,7 +44,7 @@ def reply_to_message(message):
         #if back == False:
         current_message = message
         print("\n\n\n message ",message.text,"\n\n\n")
-        all_links = requests.get("https://yts.mx/browse-movies/{}/all/all/0/latest/0/all".format(message.text))
+        all_links = requests.get("https://yts.pm/browse-movies/{}/all/all/0/latest/0/all".format(message.text))
         print(all_links)
         page = BeautifulSoup(all_links.content, 'html.parser')
         mydivs = page.findAll("a", {"class":"browse-movie-title"},href=True, text=True)
