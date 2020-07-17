@@ -13,6 +13,7 @@ server = Flask(__name__)
 
 search = False
 select = False
+search_result = []
 
 def sendMessage(message, text):
    bot.send_message(message.chat.id, text)
@@ -49,7 +50,7 @@ def send_info(message):
 # This method will fire whenever the bot receives a message from a user, it will check that there is actually a not empty string in it and, in this case, it will check if there is the 'hello' word in it, if so it will reply with the message we defined
 @bot.message_handler(func=lambda msg: msg.text is not None)
 def reply_to_message(message):
-   global search,select
+   global search,select,search_result
    if 'hello'in message.text.lower():
       sendMessage(message, 'Hello! How are you doing today?')
    else:
