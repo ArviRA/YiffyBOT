@@ -1,7 +1,12 @@
-
+import requests
 import os
+from bs4 import BeautifulSoup
 import telebot
+import json
+import os
+from telebot import types
 from flask import Flask, request
+
 TOKEN = '1010311458:AAFiDsa4J4pYXAi8UOblX2Vo3D7V8RhuvHg'
 bot = telebot.TeleBot(token=TOKEN)
 server = Flask(__name__)
@@ -12,15 +17,58 @@ def sendMessage(message, text):
 @bot.message_handler(commands=['start'])
 def send_info(message):
    text = (
-   "<b>Welcome to the Medium 🤖!</b>\n"
-   "Say Hello to the bot to get a reply from it!"
+   "<b>Welcome to the Yify BOt 🤖!</b>\n"
+   "Say /help to the bot to get to know about it!"
    )
    bot.send_message(message.chat.id, text, parse_mode='HTML')
+@bot.message_handler(commands=['help'])
+def send_info(message):
+   text = (
+   "<b>Welcome to the Yify BOt 🤖!</b>\n"
+   "use /start to start the bot \n"
+   "use /search for searching movies\n "
+   "Then select the movies from the list\n"
+   "use /back to go back to thee list \n"
+   "select the Quality of movie\n download the torrent! have fun."
+   )
+   bot.send_message(message.chat.id, text, parse_mode='HTML')
+
+
 # This method will fire whenever the bot receives a message from a user, it will check that there is actually a not empty string in it and, in this case, it will check if there is the 'hello' word in it, if so it will reply with the message we defined
 @bot.message_handler(func=lambda msg: msg.text is not None)
 def reply_to_message(message):
    if 'hello'in message.text.lower():
       sendMessage(message, 'Hello! How are you doing today?')
+   else:
+        base_url = ""
+        #if back == False:
+        current_message = message
+        all_links = requests.get("https://yts.mx/browse-movies/{}/all/all/0/latest/0/all".format(current_message.text))
+        page = BeautifulSoup(all_links.content, 'html.parser')
+        mydivs = page.findAll("a", {"class":"browse-movie-title"},href=True, text=True)
+        years=page.findAll("div",{"class":"browse-movie-year"})
+        search_result = []
+        for i,j in zip(mydivs,years):
+            dummy=i.text
+            if "[" in dummy :
+                dummy = dummy.split("] ")[1]
+    
+            search_result.append((dummy,j.text,i["href"]))
+        
+        #print(search,search_result)
+        start = False
+        search = False
+        select = True
+        markup = types.ReplyKeyboardMarkup(row_width=4)
+        #print(search_result)
+        if len(search_result) != 0:
+            for i in search_result:
+                keyword = str (i[0] + " " + i[1])
+                item = types.KeyboardButton(keyword)
+                markup.add(item)
+            bot.send_message(current_message.from_user.id, "Choose a movie:", reply_markup=markup)
+        else :
+            bot.reply_to(current_message, current_message.from_user.first_name + ",No such movies are present! try again\n /search")   
 
 @server.route('/' + TOKEN, methods=['POST'])
 def getMessage():
