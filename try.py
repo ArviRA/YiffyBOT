@@ -48,11 +48,12 @@ def reply_to_message(message):
         page = BeautifulSoup(all_links.content, 'html.parser')
         mydivs = page.findAll("a", {"class":"browse-movie-title"},href=True, text=True)
         years=page.findAll("div",{"class":"browse-movie-year"})
+        print("\n\n\n\nMy div",mydivs,"\n\n\n\n")
         search_result = []
         for i,j in zip(mydivs,years):
             dummy=i.text
             if "[" in dummy :
-                dummy = dummy.split("] ")[1]
+                dummy = dummy.split("] ")[1] 
     
             search_result.append((dummy,j.text,i["href"]))
         
