@@ -75,11 +75,11 @@ def reply_to_message(message):
         
         print("\n\n\n\n search result",search_result)
         start = False
-        search = False
         select = True
         markup = types.ReplyKeyboardMarkup(row_width=4)
         #print(search_result)
         if len(search_result) != 0:
+            search = False
             for i in search_result:
                 keyword = str (i[0] + " " + i[1])
                 item = types.KeyboardButton(keyword)
