@@ -92,7 +92,7 @@ def echo_all(message):
                 break
         
         if flag == True:
-            all_links = requests.get(base_url)
+            all_links = requests.get("https://yts.ae"+base_url)
             page = BeautifulSoup(all_links.content, 'html.parser')
             years=page.find("div",{"id":"movie-info"})
             years=str(years)[0:150]
