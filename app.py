@@ -29,6 +29,7 @@ def send_welcome(message):
       #print(message)
       start = True
       quality = False
+      print("\n\n\n:mx api",requests.get(https://yts.mx/api/v2/movie_details.json?movie_id=31706))
       bot.reply_to(message, "Welcome {}\n Enter /search to begin".format(message.from_user.first_name))
     elif(message.text == '/search'):
         global search
