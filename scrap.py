@@ -1,4 +1,8 @@
 import requests
+from bs4 import BeautifulSoup
 
-all_links = requests.get("https://yts.mx/browse-movies/{}/all/all/0/latest/0/all".format("se7en"))
-print(all_links)
+all_links = requests.get("https://yts.ws/movie/se7en-1995")
+page = BeautifulSoup(all_links.content, 'html.parser')
+years=page.find("div",{"class":"ava11"})
+print(type(years))
+print(years.find_all(href=True))
