@@ -12,7 +12,7 @@ from flask import Flask, request
 TOKEN = '1010311458:AAFiDsa4J4pYXAi8UOblX2Vo3D7V8RhuvHg'
 bot = telebot.TeleBot(token=TOKEN)
 server = Flask(__name__)
-apihelper.proxy = {'https': 'socks5://login:pass@12.11.22.33:8000'}
+#apihelper.proxy = {'https': 'socks5://login:pass@12.11.22.33:8000'}
 
 search = False
 select = False
