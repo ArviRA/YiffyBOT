@@ -13,9 +13,9 @@ proxies = {
  "https": "http://37.57.82.211:8282",
 }
 url = "http://httpbin.org/ip"
-r = requests.get("https://yts.pm/browse-movies/{}/all/all/0/latest/0/all".format("avengers"), proxies=proxies, verify=False)
-print("\n\n\nthis   nioi")
-print(r.json())
+#r = requests.get("https://yts.pm/browse-movies/{}/all/all/0/latest/0/all".format("avengers"), proxies=proxies, verify=False)
+#print("\n\n\nthis   nioi")
+#print(r.json())
 
 #all_links = requests.get("https://yts.pm/browse-movies/{}/all/all/0/latest/0/all".format("avengers"),  proxies=proxies)
 #print(all_links,"\n\n\n")
@@ -41,9 +41,9 @@ search_result = []'''
 
 
 
-
-all_links = requests.get("https://yifytorrent.vip/search?keyword=avengers")
+all_links = requests.get("https://yifytorrent.vip/search?keyword=se7en")
 #print(all_links.content)
+print(all_links.status_code)
 page = BeautifulSoup(all_links.content, 'html.parser')
 divs=page.find("div",{"class":"homepage-dt"})
 for link in divs.find_all("a"):
@@ -56,8 +56,11 @@ for link in divs.find_all("a"):
    	search_result.append((link.text,test))
 print(search_result)
 
-print("base","https://www.yst.am{}".format(search_result[0][1]))
-all_links = requests.get("https://www.yst.am{}".format(search_result[0][1]))
+try:
+ 	all_links = requests.get("https://yts.ae/movies/{}".format(search_result[0][1]))
+except Exception as e:
+	all_links = requests.get("https://www.yst.am{}".format(search_result[0][1]))
+print(all_links.status_code)
 page = BeautifulSoup(all_links.content, 'html.parser')
 years=page.find("div",{"id":"movie-info"})
 years=str(years)[0:150]
