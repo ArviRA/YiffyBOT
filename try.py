@@ -14,7 +14,10 @@ server = Flask(__name__)
 
 search = False
 select = False
+quality = False
+
 search_result = []
+torrents = []
 
 def sendMessage(message, text):
    bot.send_message(message.chat.id, text)
@@ -51,7 +54,7 @@ def send_info(message):
 # This method will fire whenever the bot receives a message from a user, it will check that there is actually a not empty string in it and, in this case, it will check if there is the 'hello' word in it, if so it will reply with the message we defined
 @bot.message_handler(func=lambda msg: msg.text is not None)
 def reply_to_message(message):
-   global search,select,search_result
+   global search,select,search_result,torrents
    if 'hello'in message.text.lower():
       sendMessage(message, 'Hello! How are you doing today?')
    else:
@@ -134,6 +137,19 @@ def reply_to_message(message):
         else:
             bot.send_message(message.from_user.id,"The movie is not found")
             search = True
+      elif quality:
+         flag = False
+         val = message.text
+         for torrent in torrents:
+             if torrent[0] in val:
+                 bot.reply_to(message,"Click here to download the torrent file \n " + torrent[2])
+                 flag = True
+         if flag == False:
+                 bot.reply_to(message, message.from_user.first_name + ",please Enter the quality!\n Use /help ")  
+         if select != False and search != False and start != False:
+             quality = False
+      else :
+        bot.reply_to(message, message.from_user.first_name + ", Use /help ")      
 @server.route('/' + TOKEN, methods=['POST'])
 def getMessage():
    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
