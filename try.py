@@ -43,6 +43,7 @@ def reply_to_message(message):
         base_url = ""
         #if back == False:
         current_message = message
+        print("\n\n\n message ",message.text,"\n\n\n")
         all_links = requests.get("https://yts.mx/browse-movies/{}/all/all/0/latest/0/all".format(current_message.text))
         page = BeautifulSoup(all_links.content, 'html.parser')
         mydivs = page.findAll("a", {"class":"browse-movie-title"},href=True, text=True)
@@ -55,7 +56,7 @@ def reply_to_message(message):
     
             search_result.append((dummy,j.text,i["href"]))
         
-        #print(search,search_result)
+        print("\n\n\n\n search result",search_result)
         start = False
         search = False
         select = True
