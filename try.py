@@ -20,6 +20,7 @@ def send_info(message):
    "<b>Welcome to the Yify BOt 🤖!</b>\n"
    "Say /help to the bot to get to know about it!"
    )
+   print("\n\n\n:mx api",requests.get(https://yts.mx/api/v2/movie_details.json?movie_id=31706))
    bot.send_message(message.chat.id, text, parse_mode='HTML')
 @bot.message_handler(commands=['help'])
 def send_info(message):
