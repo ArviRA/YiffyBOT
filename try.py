@@ -20,7 +20,7 @@ def send_info(message):
    "<b>Welcome to the Yify BOt 🤖!</b>\n"
    "Say /help to the bot to get to know about it!"
    )
-   summa=requests.get("https://ytss.unblocked.is/movies/se7en-1995")
+   summa=requests.get("https://yts.ae/movies/spl-kill-zone-2005")
    print("\n\n\n:mx api",summa)
    bot.send_message(message.chat.id, text, parse_mode='HTML')
 @bot.message_handler(commands=['help'])
