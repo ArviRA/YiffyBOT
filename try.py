@@ -12,6 +12,7 @@ bot = telebot.TeleBot(token=TOKEN)
 server = Flask(__name__)
 
 search = False
+select = False
 
 def sendMessage(message, text):
    bot.send_message(message.chat.id, text)
@@ -48,7 +49,7 @@ def send_info(message):
 # This method will fire whenever the bot receives a message from a user, it will check that there is actually a not empty string in it and, in this case, it will check if there is the 'hello' word in it, if so it will reply with the message we defined
 @bot.message_handler(func=lambda msg: msg.text is not None)
 def reply_to_message(message):
-   global search
+   global search,select
    if 'hello'in message.text.lower():
       sendMessage(message, 'Hello! How are you doing today?')
    else:
@@ -74,12 +75,11 @@ def reply_to_message(message):
             search_result.append((dummy,j.text,i["href"]))
         
         print("\n\n\n\n search result",search_result)
-        start = False
-        select = True
         markup = types.ReplyKeyboardMarkup(row_width=4)
         #print(search_result)
         if len(search_result) != 0:
             search = False
+            select = True
             for i in search_result:
                 keyword = str (i[0] + " " + i[1])
                 item = types.KeyboardButton(keyword)
@@ -87,7 +87,51 @@ def reply_to_message(message):
             bot.send_message(current_message.from_user.id, "Choose a movie:", reply_markup=markup)
         else :
             bot.reply_to(current_message, current_message.from_user.first_name + ",No such movies are present! try again\n /search")   
-
+      
+      elif select:
+        flag=False
+        for i in search_result:
+            if i[0] in message.text:
+                base_url=i[2]
+                #print(base_url)
+                flag=True
+                break
+        
+        if flag == True:
+            all_links = requests.get("https://yts.ae"+base_url)
+            page = BeautifulSoup(all_links.content, 'html.parser')
+            years=page.find("div",{"id":"movie-info"})
+            years=str(years)[0:150]
+            id = re.search('("\d+")',years).group().strip('"')   
+            print("\n\n\n\n id:::::",id)
+            movie=requests.get("https://yts.mx/api/v2/movie_details.json?movie_id={}".format(id))
+            movie = json.loads(movie.content)
+            image_url=movie["data"]["movie"]['large_cover_image']
+            rating =str(movie["data"]["movie"]['rating']) + " \U0001F31F"
+            run_time = str(movie["data"]["movie"]['runtime'])+" minutes \U0001F554"
+            genre = movie["data"]["movie"]['genres']
+            certificate = str(movie["data"]["movie"]['mpa_rating']) + "\U0001F4A9"
+            #print(rating ,run_time," ",genre," ",certificate)
+            quality = []
+            quality = movie["data"]["movie"]['torrents']
+            torrents = []
+            markup = types.ReplyKeyboardMarkup(row_width=4)
+            for i in range(len(quality)):
+                qua = str(quality[i]["quality"])+"\U0001F4C0"
+                url = quality[i]["url"]
+                size = str(quality[i]["size"])+"\U0001F4C2"
+                torrents.append((qua,size,url))
+                item = types.KeyboardButton(qua+"\n"+size)
+                markup.add(item)
+                #print(qua," ",url," ",size)
+            select = False    
+            quality = True
+            bot.send_photo(message.from_user.id, image_url)
+            bot.send_message(message.from_user.id,"Rating : {}\nRuntime : {}\nGenre : {}\nCertificate : {}".format(rating,run_time,genre,certificate))
+            bot.send_message(message.from_user.id, "Choose a quality:", reply_markup=markup)
+        else:
+            bot.send_message(message.from_user.id,"The movie is not found")
+            search = True
 @server.route('/' + TOKEN, methods=['POST'])
 def getMessage():
    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
