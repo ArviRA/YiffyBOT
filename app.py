@@ -54,7 +54,7 @@ def echo_all(message):
         base_url = ""
         #if back == False:
         current_message = message
-        all_links = requests.get("https://yts.mx/browse-movies/{}/all/all/0/latest/0/all".format(current_message.text))
+        all_links = requests.get("https://yts.pm/browse-movies/{}/all/all/0/latest".format(current_message.text))
         page = BeautifulSoup(all_links.content, 'html.parser')
         mydivs = page.findAll("a", {"class":"browse-movie-title"},href=True, text=True)
         years=page.findAll("div",{"class":"browse-movie-year"})
