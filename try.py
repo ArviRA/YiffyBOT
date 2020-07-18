@@ -11,12 +11,6 @@ TOKEN = '1010311458:AAFiDsa4J4pYXAi8UOblX2Vo3D7V8RhuvHg'
 bot = telebot.TeleBot(token=TOKEN)
 server = Flask(__name__)
 
-search = False
-select = False
-quality = False
-
-search_result = []
-torrents = []
 user = {}
 
 def sendMessage(message, text):
@@ -44,12 +38,10 @@ def send_info(message):
 
 @bot.message_handler(commands=['search'])
 def send_info(message):
-   global search,user
+   global user
    text = (
    "Enter the movie name to search"
    )
-   
-   search = True
    user[str(message.from_user.id)]={"search" : True,"select":False,"quality":False,"search_result":[],"torrents":[]}
    print("\n\n\n",user)
    bot.send_message(message.chat.id, text, parse_mode='HTML')
@@ -57,7 +49,7 @@ def send_info(message):
 # This method will fire whenever the bot receives a message from a user, it will check that there is actually a not empty string in it and, in this case, it will check if there is the 'hello' word in it, if so it will reply with the message we defined
 @bot.message_handler(func=lambda msg: msg.text is not None)
 def reply_to_message(message):
-   global search,select,search_result,torrents,quality,user
+   global user
    if 'hello'in message.text.lower():
       sendMessage(message, 'Hello! How are you doing today?')
    else:
@@ -95,19 +87,20 @@ def reply_to_message(message):
         markup = types.ReplyKeyboardMarkup(row_width=4)
         #print(search_result)
         if len(search_result) != 0:
-            search = False
-            select = True
+            user[str(message.from_user.id)]["search"] = False
+            user[str(message.from_user.id)]["select"] = True
             for i in search_result:
                 keyword = str(i[0])
                 item = types.KeyboardButton(keyword)
                 markup.add(item)
+            user[str(message.from_user.id)]["search_result"] = search_result
             bot.send_message(current_message.from_user.id, "Choose a movie:", reply_markup=markup)
         else :
             bot.reply_to(current_message, current_message.from_user.first_name + ",No such movies are present! try again\n /search")   
       
-      elif select:
+      elif user[str(message.from_user.id)]["select"]:
         flag=False
-        for i in search_result:
+        for i in user[str(message.from_user.id)]["search_result"]:
             if i[0] == message.text:
                 base_url=i[1]
                 #print(base_url)
@@ -147,30 +140,31 @@ def reply_to_message(message):
                     item = types.KeyboardButton(qua+"\n"+size)
                     markup.add(item)
                   #print(qua," ",url," ",size)
-                  select = False    
-                  quality = True
+                  user[str(message.from_user.id)]["select"] = False    
+                  user[str(message.from_user.id)]["quality"] = True
+                  user[str(message.from_user.id)]["torrents"] = torrents
                   bot.send_photo(message.from_user.id, image_url)
                   bot.send_message(message.from_user.id,"Rating : {}\nRuntime : {}\nGenre : {}\nCertificate : {}".format(rating,run_time,genre,certificate))
                   bot.send_message(message.from_user.id, "Choose a quality:", reply_markup=markup)  
                except Exception as e: 
                   bot.send_message(message.from_user.id, "Movie you choose has been removed!try again\n")
-                  search = True
+                  user[str(message.from_user.id)]["search"] = True
                #print("\n\n\n\n id:::::",id)
                
         else:
             bot.send_message(message.from_user.id,"The movie is not found")
-            search = True
-      elif quality:
+            user[str(message.from_user.id)]["search"] = True
+      elif user[str(message.from_user.id)]["quality"]:
          flag = False
          val = message.text
-         for torrent in torrents:
+         for torrent in user[str(message.from_user.id)]["torrents"]:
              if torrent[0] in val:
                  bot.reply_to(message,"Click here to download the torrent file \n " + torrent[2])
                  flag = True
          if flag == False:
                  bot.reply_to(message, message.from_user.first_name + ",please Enter the quality!\n Use /help ")  
-         if select != False and search != False and start != False:
-             quality = False
+         if user[str(message.from_user.id)]["select"] != False and user[str(message.from_user.id)]["search"] != False:
+             user[str(message.from_user.id)]["quality"] = False
       else :
         bot.reply_to(message, message.from_user.first_name + ", Use /help ")      
 @server.route('/' + TOKEN, methods=['POST'])
