@@ -62,7 +62,7 @@ def send_info(message):
                 keyword = str(i[0])
                 item = types.KeyboardButton(keyword)
                 markup.add(item)
-    user[str(message.from_user.id)]["search_result"] = search_result
+    #user[str(message.from_user.id)]["search_result"] = search_result
     bot.send_message(current_message.from_user.id, "Choose a movie:", reply_markup=markup)
    else:
       bot.send_message(current_message.from_user.id, "No searches found!!!")
