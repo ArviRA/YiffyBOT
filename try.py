@@ -7,7 +7,7 @@ import os
 from telebot import types
 from flask import Flask, request
 
-TOKEN = '1010311458:AAFiDsa4J4pYXAi8UOblX2Vo3D7V8RhuvHg'
+TOKEN = '' #add ypur TELEGBOT API HERE
 bot = telebot.TeleBot(token=TOKEN)
 server = Flask(__name__)
 
@@ -204,7 +204,7 @@ def getMessage():
 @server.route("/")
 def webhook():
    bot.remove_webhook()
-   bot.set_webhook(url='https://boiling-citadel-60592.herokuapp.com/' + TOKEN)
+   bot.set_webhook(url="" + TOKEN) #ADD YOUR WEBHOOK URL
    return "!", 200
 if __name__ == "__main__":
    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))      
