@@ -63,9 +63,9 @@ def send_info(message):
                 item = types.KeyboardButton(keyword)
                 markup.add(item)
     #user[str(message.from_user.id)]["search_result"] = search_result
-    bot.send_message(current_message.from_user.id, "Choose a movie:", reply_markup=markup)
+    bot.send_message(message.from_user.id, "Choose a movie:", reply_markup=markup)
    else:
-      bot.send_message(current_message.from_user.id, "No searches found!!!")
+      bot.send_message(message.from_user.id, "No searches found!!!")
 
 @bot.message_handler(commands=['exit'])
 def send_info(message):
@@ -119,9 +119,9 @@ def reply_to_message(message):
                 item = types.KeyboardButton(keyword)
                 markup.add(item)
             user[str(message.from_user.id)]["search_result"] = search_result
-            bot.send_message(current_message.from_user.id, "Choose a movie:", reply_markup=markup)
+            bot.send_message(message.from_user.id, "Choose a movie:", reply_markup=markup)
         else :
-            bot.reply_to(current_message, current_message.from_user.first_name + ",No such movies are present! try again\n /search")   
+            bot.reply_to(message,message.from_user.first_name + ",No such movies are present! try again\n /search")   
       
       elif user[str(message.from_user.id)]["select"]:
         flag=False
