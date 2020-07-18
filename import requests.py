@@ -4,5 +4,6 @@ import re
 import json
 
 
-link=requests.get("https://www.yst.am/movies/se7en-1995")
-print(link.content)
+link=requests.get("https://www.yst.am/movies/the-iron-mask-2019")
+link=BeautifulSoup(link.content,"html.parser")
+print(link.prettify)
