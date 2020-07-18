@@ -3,9 +3,7 @@ from bs4 import BeautifulSoup
 import re
 import json
 from itertools import cycle
-import traceback
-from proxy_requests import ProxyRequests
-from lxml.html import fromstring
+
 
 search_result = []
 proxies = {
@@ -41,7 +39,7 @@ search_result = []'''
 
 
 
-all_links = requests.get("https://yifytorrent.vip/search?keyword=se7en")
+all_links = requests.get("https://yifytorrent.vip/search?keyword=Django")
 #print(all_links.content)
 print(all_links.status_code)
 page = BeautifulSoup(all_links.content, 'html.parser')
@@ -57,10 +55,11 @@ for link in divs.find_all("a"):
 print(search_result)
 
 try:
- 	all_links = requests.get("https://yts.ae/movies/{}".format(search_result[0][1]))
+ 	all_links = requests.get("https://yts.ae{}".format(search_result[0][1]))
 except Exception as e:
 	all_links = requests.get("https://www.yst.am{}".format(search_result[0][1]))
-print(all_links.status_code)
+
+print(all_links)
 page = BeautifulSoup(all_links.content, 'html.parser')
 years=page.find("div",{"id":"movie-info"})
 years=str(years)[0:150]

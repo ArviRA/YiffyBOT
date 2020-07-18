@@ -121,7 +121,7 @@ def reply_to_message(message):
                 break
         
         if flag == True:
-            all_links = requests.get("https://yifytorrent.vip/"+base_url)
+            all_links = requests.get("https://yst.am"+base_url)
             page = BeautifulSoup(all_links.content, 'html.parser')
             years=page.find("div",{"id":"movie-info"})
             years=str(years)[0:150]
