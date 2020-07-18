@@ -158,7 +158,7 @@ def reply_to_message(message):
                   bot.send_message(message.from_user.id,"Rating : {}\nRuntime : {}\nGenre : {}\nCertificate : {}".format(rating,run_time,genre,certificate))
                   bot.send_message(message.from_user.id, "Choose a quality:", reply_markup=markup)  
                except Exception as e: 
-                  bot.send_message(current_message.from_user.id, "Movie you choose has been removed!try again\n")
+                  bot.send_message(message.from_user.id, "Movie you choose has been removed!try again\n")
                   search = True
                #print("\n\n\n\n id:::::",id)
                
