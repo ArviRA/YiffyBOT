@@ -50,7 +50,9 @@ def send_info(message):
 
 @bot.message_handler(commands=['back'])
 def send_info(message):
-   user[str(message.from_user.id)]={"search" : False,"select":True,"quality":False}
+   user[str(message.from_user.id)]["search"] = False
+   user[str(message.from_user.id)]["select"] = True
+   user[str(message.from_user.id)]["quality"] = False
    if len(user[str(message.from_user.id)]["search_result"]) !=0 : 
     for i in user[str(message.from_user.id)]["search_result"]:
                 keyword = str(i[0])
