@@ -50,15 +50,6 @@ def send_info(message):
    )
    
    search = True
-   bot.send_message(message.chat.id, text, parse_mode='HTML')
-
-@bot.message_handler(commands=['search'])
-def send_info(message):
-   global search
-   text = (
-   "Enter the movie name to search"
-   )
-   search = True
    user[str(message.from_user.id)]={"search" : True,"select":False,"quality":False,"search_result":[],"torrents":[]}
    print("\n\n\n",user)
    bot.send_message(message.chat.id, text, parse_mode='HTML')
