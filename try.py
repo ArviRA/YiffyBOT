@@ -121,37 +121,48 @@ def reply_to_message(message):
                 break
         
         if flag == True:
-            all_links = requests.get("https://yst.am"+base_url)
-            page = BeautifulSoup(all_links.content, 'html.parser')
-            years=page.find("div",{"id":"movie-info"})
-            years=str(years)[0:150]
-            id = re.search('("\d+")',years).group().strip('"')   
-            print("\n\n\n\n id:::::",id)
-            movie=requests.get("https://yts.mx/api/v2/movie_details.json?movie_id={}".format(id))
-            movie = json.loads(movie.content)
-            image_url=movie["data"]["movie"]['large_cover_image']
-            rating =str(movie["data"]["movie"]['rating']) + " \U0001F31F"
-            run_time = str(movie["data"]["movie"]['runtime'])+" minutes \U0001F554"
-            genre = movie["data"]["movie"]['genres']
-            certificate = str(movie["data"]["movie"]['mpa_rating']) + "\U0001F4A9"
-            #print(rating ,run_time," ",genre," ",certificate)
-            quality = []
-            quality = movie["data"]["movie"]['torrents']
-            torrents = []
-            markup = types.ReplyKeyboardMarkup(row_width=4)
-            for i in range(len(quality)):
-                qua = str(quality[i]["quality"])+"\U0001F4C0"
-                url = quality[i]["url"]
-                size = str(quality[i]["size"])+"\U0001F4C2"
-                torrents.append((qua,size,url))
-                item = types.KeyboardButton(qua+"\n"+size)
-                markup.add(item)
+            temp = True
+            try:
+             all_links = requests.get("https://yst.am"+base_url)
+            except Exception as e:
+             try:  
+              all_links = requests.get("https://yts.ae"+base_url)
+             except:
+               bot.send_message(current_message.from_user.id, "Movie you choose has been removed!try again\n")
+               search = True
+               temp = False
+               
+            if temp == True:
+               page = BeautifulSoup(all_links.content, 'html.parser')
+               years=page.find("div",{"id":"movie-info"})
+               years=str(years)[0:150]
+               id = re.search('("\d+")',years).group().strip('"')   
+               #print("\n\n\n\n id:::::",id)
+               movie=requests.get("https://yts.mx/api/v2/movie_details.json?movie_id={}".format(id))
+               movie = json.loads(movie.content)
+               image_url=movie["data"]["movie"]['large_cover_image']
+               rating =str(movie["data"]["movie"]['rating']) + " \U0001F31F"
+               run_time = str(movie["data"]["movie"]['runtime'])+" minutes \U0001F554"
+               genre = movie["data"]["movie"]['genres']
+               certificate = str(movie["data"]["movie"]['mpa_rating']) + "\U0001F4A9"
+               #print(rating ,run_time," ",genre," ",certificate)
+               quality = []
+               quality = movie["data"]["movie"]['torrents']
+               torrents = []
+               markup = types.ReplyKeyboardMarkup(row_width=4)
+               for i in range(len(quality)):
+                   qua = str(quality[i]["quality"])+"\U0001F4C0"
+                   url = quality[i]["url"]
+                   size = str(quality[i]["size"])+"\U0001F4C2"
+                   torrents.append((qua,size,url))
+                   item = types.KeyboardButton(qua+"\n"+size)
+                   markup.add(item)
                 #print(qua," ",url," ",size)
-            select = False    
-            quality = True
-            bot.send_photo(message.from_user.id, image_url)
-            bot.send_message(message.from_user.id,"Rating : {}\nRuntime : {}\nGenre : {}\nCertificate : {}".format(rating,run_time,genre,certificate))
-            bot.send_message(message.from_user.id, "Choose a quality:", reply_markup=markup)
+               select = False    
+               quality = True
+               bot.send_photo(message.from_user.id, image_url)
+               bot.send_message(message.from_user.id,"Rating : {}\nRuntime : {}\nGenre : {}\nCertificate : {}".format(rating,run_time,genre,certificate))
+               bot.send_message(message.from_user.id, "Choose a quality:", reply_markup=markup)
         else:
             bot.send_message(message.from_user.id,"The movie is not found")
             search = True
