@@ -59,7 +59,7 @@ def send_info(message):
    "Enter the movie name to search"
    )
    search = True
-   user[str(message.from_user.id])={"search" : True,"select":False,"quality":False,"search_result":[],"torrents":[]}
+   user[str(message.from_user.id)]={"search" : True,"select":False,"quality":False,"search_result":[],"torrents":[]}
    print("\n\n\n",user)
    bot.send_message(message.chat.id, text, parse_mode='HTML')
 
