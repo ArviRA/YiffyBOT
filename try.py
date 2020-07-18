@@ -46,6 +46,16 @@ def send_info(message):
    print("\n\n\n",user)
    bot.send_message(message.chat.id, text, parse_mode='HTML')
 
+@bot.message_handler(commands=['back'])
+def send_info(message):
+   user[str(message.from_user.id)]={"search" : False,"select":True,"quality":False}
+   reply_to_message(message)
+
+   
+@bot.message_handler(commands=['exit'])
+def send_info(message):
+   global user
+   user.pop(str(message.from_user.id))
 # This method will fire whenever the bot receives a message from a user, it will check that there is actually a not empty string in it and, in this case, it will check if there is the 'hello' word in it, if so it will reply with the message we defined
 @bot.message_handler(func=lambda msg: msg.text is not None)
 def reply_to_message(message):
