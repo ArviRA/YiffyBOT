@@ -51,9 +51,11 @@ def send_info(message):
 @bot.message_handler(commands=['back'])
 def send_info(message):
    global user
+   print(user)
    user[str(message.from_user.id)]["search"] = False
    user[str(message.from_user.id)]["select"] = True
    user[str(message.from_user.id)]["quality"] = False
+   print(user)
    if len(user[str(message.from_user.id)]["search_result"]) !=0 : 
     markup = types.ReplyKeyboardMarkup(row_width=4)  
     for i in user[str(message.from_user.id)]["search_result"]:
