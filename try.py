@@ -24,6 +24,8 @@ def send_info(message):
    )
    print("\n\n\n:message",message)
    bot.send_message(message.chat.id, text, parse_mode='HTML')
+
+
 @bot.message_handler(commands=['help'])
 def send_info(message):
    text = (
@@ -49,9 +51,16 @@ def send_info(message):
 @bot.message_handler(commands=['back'])
 def send_info(message):
    user[str(message.from_user.id)]={"search" : False,"select":True,"quality":False}
-   reply_to_message(message)
+   if len(user[str(message.from_user.id)]["search_result"]) !=0 : 
+    for i in user[str(message.from_user.id)]["search_result"]:
+                keyword = str(i[0])
+                item = types.KeyboardButton(keyword)
+                markup.add(item)
+    user[str(message.from_user.id)]["search_result"] = search_result
+    bot.send_message(current_message.from_user.id, "Choose a movie:", reply_markup=markup)
+   else:
+      bot.send_message(current_message.from_user.id, "No searches found!!!")
 
-   
 @bot.message_handler(commands=['exit'])
 def send_info(message):
    global user
@@ -176,7 +185,10 @@ def reply_to_message(message):
          if user[str(message.from_user.id)]["select"] != False and user[str(message.from_user.id)]["search"] != False:
              user[str(message.from_user.id)]["quality"] = False
       else :
-        bot.reply_to(message, message.from_user.first_name + ", Use /help ")      
+        bot.reply_to(message, message.from_user.first_name + ", Use /help ") 
+
+
+
 @server.route('/' + TOKEN, methods=['POST'])
 def getMessage():
    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
