@@ -152,6 +152,7 @@ def reply_to_message(message):
                   run_time = str(movie["data"]["movie"]['runtime'])+" minutes \U0001F554"
                   genre = movie["data"]["movie"]['genres']
                   certificate = str(movie["data"]["movie"]['mpa_rating']) + "\U0001F4A9"
+                  trailer = "https://youtu.be/"+str(movie["data"]["movie"]['yt_trailer_code'])
                   #print(rating ,run_time," ",genre," ",certificate)
                   quality = []
                   quality = movie["data"]["movie"]['torrents']
@@ -169,7 +170,7 @@ def reply_to_message(message):
                   user[str(message.from_user.id)]["quality"] = True
                   user[str(message.from_user.id)]["torrents"] = torrents
                   bot.send_photo(message.from_user.id, image_url)
-                  bot.send_message(message.from_user.id,"Rating : {}\nRuntime : {}\nGenre : {}\nCertificate : {}".format(rating,run_time,genre,certificate))
+                  bot.send_message(message.from_user.id,"Rating : {}\nRuntime : {}\nGenre : {}\nCertificate : {}\nTrailer : {}".format(rating,run_time,genre,certificate,trailer))
                   bot.send_message(message.from_user.id, "Choose a quality:", reply_markup=markup)  
                except Exception as e: 
                   bot.send_message(message.from_user.id, "Movie you choose has been removed!try again\n")
@@ -185,6 +186,7 @@ def reply_to_message(message):
          for torrent in user[str(message.from_user.id)]["torrents"]:
              if torrent[0] in val:
                  bot.reply_to(message,"Click here to download the torrent file \n " + torrent[2])
+                 user.pop(str(message.from_user.id))
                  flag = True
          if flag == False:
                  bot.reply_to(message, message.from_user.first_name + ",please Enter the quality!\n Use /help ")  
