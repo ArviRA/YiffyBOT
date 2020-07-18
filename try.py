@@ -54,6 +54,7 @@ def send_info(message):
    user[str(message.from_user.id)]["select"] = True
    user[str(message.from_user.id)]["quality"] = False
    if len(user[str(message.from_user.id)]["search_result"]) !=0 : 
+    markup = types.ReplyKeyboardMarkup(row_width=4)  
     for i in user[str(message.from_user.id)]["search_result"]:
                 keyword = str(i[0])
                 item = types.KeyboardButton(keyword)
