@@ -77,9 +77,11 @@ def send_info(message):
    )
    user[str(message.from_user.id)]={"search" : True,"select":False,"quality":False,"search_result":[],"torrents":[],'sub':False,'genre':[],"movies":[]}
    print("\n\n\n",user)
+   #db.child("subscribers").child(message.from_user.id).update(user[str(message.from_user.id)])
    val = dict(db.child("subscribers").get().val())
    for key in val.keys():
-      user[key] = val[key]
+      if key == "sub" or key == "movies":
+         user[key] = val[key]
    markup = types.ReplyKeyboardRemove(selective=False)
    bot.send_message(message.chat.id, text, parse_mode='HTML',reply_markup=markup)
 
@@ -113,7 +115,7 @@ def reply_to_message(message):
    if 'hello'in message.text.lower():
       sendMessage(message, 'Hello! How are you doing today?')
    else:
-      print(user[str(message.from_user.id)]["search"],"the trialll")
+      print(user[str(message.from_user.id)],"the trialll")
       if(user[str(message.from_user.id)]["search"]):
         base_url = ""
         
@@ -180,7 +182,8 @@ def reply_to_message(message):
                   years=page.find("div",{"id":"movie-info"})
                   years=str(years)[0:150]
                   id = re.search('("\d+")',years).group().strip('"')
-                  movie=requests.get("https://yts.mx/api/v2/movie_details.json?movie_id={}".format(id))
+                  movie=requests.get("https://yts.unblockninja.com/api/v2/movie_details.json?movie_id={}".format(id))
+                  print("response",movie)
                   movie = json.loads(movie.content)
                   image_url=movie["data"]["movie"]['large_cover_image']
                   rating =str(movie["data"]["movie"]['rating']) + " \U0001F31F"
@@ -212,12 +215,16 @@ def reply_to_message(message):
                   user[str(message.from_user.id)]["select"] = False    
                   user[str(message.from_user.id)]["quality"] = True
                   user[str(message.from_user.id)]["torrents"] = torrents
+                  name  = message.text
+                  name = name.replace(" ",'_')
+                  user[str(message.from_user.id)]["movie_name"] = name
                   bot.send_photo(message.from_user.id, image_url)
                   #user[str(message.from_user.id)]["genre"].append(tuple(genre))
                   print(user[str(message.from_user.id)],genre,"the")
                   #user[str(message.from_user.id)]["movie"].append(str(message.text))
                   print(user)
-                  db.child("subscribers").child(message.from_user.id).update(user[str(message.from_user.id)]) 
+                  #movies = user[str(message.from_user.id)]["movie"].append(str(message.text))
+                  db.child("subscribers").child(message.from_user.id).update({'sub':user[str(message.from_user.id)]["sub"]}) 
                   bot.send_message(message.from_user.id,"Rating : {}\nRuntime : {}\nGenre : {}\nCertificate : {}\nOne line : {}\nTrailer : {}".format(rating,run_time,genre,certificate,plot,trailer))
                   bot.send_message(message.from_user.id, "Choose a quality:", reply_markup=markup)  
                except Exception as e: 
@@ -234,11 +241,16 @@ def reply_to_message(message):
          for torrent in user[str(message.from_user.id)]["torrents"]:
              if torrent[0] in val:
                  markup = types.ReplyKeyboardRemove(selective=False)
+                 print("ulla vanthruchu")
                  #bot.reply_to(message,"Click here to download the torrent file \n " + torrent[2],reply_markup=markup)
-                 link = open("download.torrent",'wb')
+                 name  = user[str(message.from_user.id)]["movie_name"]
+                 name = str(name)+".torrent"
+                 link = open(name,'wb')
                  temp = requests.get(torrent[2])
                  link.write(temp.content)
-                 bot.send_document(message.from_user.id,link)
+                 link = open(name,'rb')
+                 bot.send_document(message.from_user.id,link,reply_markup=markup)
+                 os.remove(name)
                  user.pop(str(message.from_user.id))
                  flag = True
          if flag == False:
@@ -262,7 +274,7 @@ def webhook():
    val = dict(db.child("subscribers").get().val())
    for key in val.keys():
       user[key] = val[key]
-   bot.set_webhook(url='https://boiling-citadel-60592.herokuapp.com/' + TOKEN)
+   bot.set_webhook(url='https://yiffy-bot.herokuapp.com/' + TOKEN)
    return "!", 200
 if __name__ == "__main__":
    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
