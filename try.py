@@ -6,12 +6,25 @@ import json
 import os
 from telebot import types
 from flask import Flask, request
+import pyrebase
 
-TOKEN = '' #add ypur TELEGBOT API HERE
+TOKEN = '1010311458:AAFiDsa4J4pYXAi8UOblX2Vo3D7V8RhuvHg'
+#TOKEN = "1132062928:AAG9_QM5wgO_yhHztIbts1q1jP1YJUCvDtE"
 bot = telebot.TeleBot(token=TOKEN)
 server = Flask(__name__)
 
 user = {}
+
+config = {
+  "apiKey": "AIzaSyAmetAyOwbuLFe4eKxpL92iy-fvt_zHnLo",
+  "authDomain": "yiffybotdb.firebaseapp.com",
+  "databaseURL": "https://yiffybotdb.firebaseio.com/",
+  "storageBucket": "yiffybotdb.appspot.com",
+  "serviceAccount": "yiffybotdb-firebase-adminsdk-dix78-2ca448052d.json"
+}
+firebase = pyrebase.initialize_app(config)
+
+db  = firebase.database()
 
 def sendMessage(message, text):
    bot.send_message(message.chat.id, text)
@@ -24,6 +37,24 @@ def send_info(message):
    )
    print("\n\n\n:message",message)
    bot.send_message(message.chat.id, text, parse_mode='HTML')
+
+
+@bot.message_handler(commands=['subscribe'])
+def subscriber(message):
+   global user
+   val = dict(db.child("subscribers").get().val())
+   for key in val.keys():
+      user[key] = val[key]
+   try:
+      if user[str(message.from_user.id)]['sub'] == False:
+         user[str(message.from_user.id)]['sub'] = True
+         db.child("subscribers").child(message.from_user.id).update(user[str(message.from_user.id)])
+         bot.send_message(message.chat.id,"You've Been Subscribed!!!", parse_mode='HTML')
+      else:
+          bot.send_message(message.chat.id,"You're already Subscribed!!!", parse_mode='HTML')
+   except:
+          bot.send_message(message.chat.id,"Search atleast once to become a subscriber\n/search", parse_mode='HTML')
+
 
 
 @bot.message_handler(commands=['help'])
@@ -44,9 +75,13 @@ def send_info(message):
    text = (
    "Enter the movie name to search"
    )
-   user[str(message.from_user.id)]={"search" : True,"select":False,"quality":False,"search_result":[],"torrents":[]}
+   user[str(message.from_user.id)]={"search" : True,"select":False,"quality":False,"search_result":[],"torrents":[],'sub':False,'genre':[],"movies":[]}
    print("\n\n\n",user)
-   bot.send_message(message.chat.id, text, parse_mode='HTML')
+   val = dict(db.child("subscribers").get().val())
+   for key in val.keys():
+      user[key] = val[key]
+   markup = types.ReplyKeyboardRemove(selective=False)
+   bot.send_message(message.chat.id, text, parse_mode='HTML',reply_markup=markup)
 
 @bot.message_handler(commands=['back'])
 def send_info(message):
@@ -153,6 +188,14 @@ def reply_to_message(message):
                   genre = movie["data"]["movie"]['genres']
                   certificate = str(movie["data"]["movie"]['mpa_rating']) + "\U0001F4A9"
                   trailer = "https://youtu.be/"+str(movie["data"]["movie"]['yt_trailer_code'])
+                  try:
+                     imdb_code = movie["data"]["movie"]["imdb_code"]
+                     plot = requests.get("http://www.omdbapi.com/?i={}&apikey=d613cfc4".format(imdb_code))
+                     plot = json.loads(plot.content)
+                     plot  = plot["Plot"]
+                  except:
+                     plot = "The description not provided!!!"   
+
                   #print(rating ,run_time," ",genre," ",certificate)
                   quality = []
                   quality = movie["data"]["movie"]['torrents']
@@ -170,7 +213,12 @@ def reply_to_message(message):
                   user[str(message.from_user.id)]["quality"] = True
                   user[str(message.from_user.id)]["torrents"] = torrents
                   bot.send_photo(message.from_user.id, image_url)
-                  bot.send_message(message.from_user.id,"Rating : {}\nRuntime : {}\nGenre : {}\nCertificate : {}\nTrailer : {}".format(rating,run_time,genre,certificate,trailer))
+                  #user[str(message.from_user.id)]["genre"].append(tuple(genre))
+                  print(user[str(message.from_user.id)],genre,"the")
+                  #user[str(message.from_user.id)]["movie"].append(str(message.text))
+                  print(user)
+                  db.child("subscribers").child(message.from_user.id).update(user[str(message.from_user.id)]) 
+                  bot.send_message(message.from_user.id,"Rating : {}\nRuntime : {}\nGenre : {}\nCertificate : {}\nOne line : {}\nTrailer : {}".format(rating,run_time,genre,certificate,plot,trailer))
                   bot.send_message(message.from_user.id, "Choose a quality:", reply_markup=markup)  
                except Exception as e: 
                   bot.send_message(message.from_user.id, "Movie you choose has been removed!try again\n")
@@ -185,7 +233,12 @@ def reply_to_message(message):
          val = message.text
          for torrent in user[str(message.from_user.id)]["torrents"]:
              if torrent[0] in val:
-                 bot.reply_to(message,"Click here to download the torrent file \n " + torrent[2])
+                 markup = types.ReplyKeyboardRemove(selective=False)
+                 #bot.reply_to(message,"Click here to download the torrent file \n " + torrent[2],reply_markup=markup)
+                 link = open("download.torrent",'wb')
+                 temp = requests.get(torrent[2])
+                 link.write(temp.content)
+                 bot.send_document(message.from_user.id,link)
                  user.pop(str(message.from_user.id))
                  flag = True
          if flag == False:
@@ -197,6 +250,7 @@ def reply_to_message(message):
 
 
 
+
 @server.route('/' + TOKEN, methods=['POST'])
 def getMessage():
    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
@@ -204,8 +258,12 @@ def getMessage():
 @server.route("/")
 def webhook():
    bot.remove_webhook()
-   bot.set_webhook(url="" + TOKEN) #ADD YOUR WEBHOOK URL
+   global user
+   val = dict(db.child("subscribers").get().val())
+   for key in val.keys():
+      user[key] = val[key]
+   bot.set_webhook(url='https://boiling-citadel-60592.herokuapp.com/' + TOKEN)
    return "!", 200
 if __name__ == "__main__":
-   server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))      
+   server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
       
